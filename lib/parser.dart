@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
 
+import 'country_data.dart';
+
 class Parser {
-  static List parseRow(List<String> row, bool hasInnerTag, String link) {
+
+  static CountryData parseRow(String country, List<String> row, bool hasInnerTag, String link) {
     int offset = hasInnerTag ? 0 : -2;
-    return [
-      parseInteger(row[5 + offset]),
-      parseInteger(row[7 + offset]),
-      parseInteger(row[9 + offset]),
-      parseInteger(row[11 + offset]),
-      parseInteger(row[13 + offset]),
-      parseInteger(row[15 + offset]),
-      parseInteger(row[17 + offset]),
-      parseDouble(row[19 + offset]),
-      link
-    ];
+
+    return CountryData(
+      name: country,
+      totalCases: parseInteger(row[5 + offset]),
+      newCases: parseInteger(row[7 + offset]),
+      totalDeaths: parseInteger(row[9 + offset]),
+      newDeaths: parseInteger(row[11 + offset]),
+      totalRecorded: parseInteger(row[13 + offset]),
+      activeCases: parseInteger(row[15 + offset]),
+      seriousCases: parseInteger(row[17 + offset]),
+      casesPerMln: parseDouble(row[19 + offset]),
+      link: link,
+    );
   }
 
   static int parseInteger(String s) {
@@ -40,19 +45,20 @@ class Parser {
     return n.replaceAll("&ccedil;", "ç").replaceAll("&eacute;", "é").split("<")[0];
   }
 
-  static Map<String, List> getCountryData(String body) {
-    Map<String, List> countryData = {};
+  static Map<String, CountryData> getCountryData(String body) {
+    Map<String, CountryData> countryData = {};
     var row = body.split("<tr class=\"total_row\">")[1].split("</tr>")[0].split(">");
 
-    countryData["Global"] = parseRow(row, true, "");
+    countryData[global] = parseRow(global, row, true, "");
 
     var tbody = getInnerString(body, "<tbody>", "</tbody>");
     var rows = tbody.split("<tr style=\"\">");
     rows.skip(1).forEach((rawRow) {
       row = rawRow.split(">");
       bool hasInnerTag = rawRow.contains("</a>") || rawRow.contains("</span>");
-      countryData[normalizeName(row[hasInnerTag ? 2 : 1])] =
-          parseRow(row, hasInnerTag, rawRow.contains("</a>") ? getInnerString(rawRow, "href=\"", "\"") : null);
+      final country = normalizeName(row[hasInnerTag ? 2 : 1]);
+      countryData[country] =
+          parseRow(country, row, hasInnerTag, rawRow.contains("</a>") ? getInnerString(rawRow, "href=\"", "\"") : null);
     });
     return countryData;
   }
