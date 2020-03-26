@@ -13,7 +13,7 @@ class CountryData {
   final double casesPerMln; // 7
   final dynamic link; // 8
 
-  List chartsData;
+//  List chartsData;
 
   CountryData({
     this.name = global,
@@ -28,25 +28,25 @@ class CountryData {
     this.link = true,
   });
 
-  initChartsData() {
-    chartsData = [
-      [
-        ["0", "1"],
-        [0, 1],
-      ],
-      [
-        ["0", "1"],
-        [0, 1],
-      ],
-      [
-        ["0", "1"],
-        [0, 1],
-      ],
-      false,
-      false,
-      false
-    ];
-  }
+//  initChartsData() {
+//    chartsData = [
+//      [
+//        ["0", "1"],
+//        [0, 1],
+//      ],
+//      [
+//        ["0", "1"],
+//        [0, 1],
+//      ],
+//      [
+//        ["0", "1"],
+//        [0, 1],
+//      ],
+//      false,
+//      false,
+//      false
+//    ];
+//  }
 }
 
 final countryFlags = {

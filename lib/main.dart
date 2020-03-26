@@ -34,7 +34,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   final GlobalKey _refreshIndicatorKey = GlobalKey();
   var countryData = {global: CountryData()};
-//  var chartsData = {};
+  var chartsData = {};
   String country = global;
 
   int springAnimationDuration = 750;
@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 1500),
     );
 
-    countryData[global].chartsData = Parser.getEmptyChart();
+    chartsData[global] = Parser.getEmptyChart();
 
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -66,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         _controller.forward(from: 0.0);
       });
 
-      if (countryData[localCountry].chartsData != null) {
+      if (chartsData[localCountry] != null) {
         if (localCountry != global) {
           url += countryData[localCountry].link;
           response = await http.get(url);
@@ -75,9 +75,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
         var data = Parser.getChartsData(response.body);
         setState(() {
-          countryData[localCountry].chartsData = data;
-//          chartsData[localCountry][1] = data[1];
-//          chartsData[localCountry][2] = data[2];
+          chartsData[localCountry][0] = data[0];
+          chartsData[localCountry][1] = data[1];
+          chartsData[localCountry][2] = data[2];
         });
       }
     }
@@ -160,7 +160,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 ),
               ],
             ),
-            countryData[country].chartsData != null ? createGraph(1) : SizedBox(),
+            chartsData[country] != null ? createGraph(1) : SizedBox(),
             SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -200,7 +200,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 ),
               ],
             ),
-            countryData[country].chartsData != null ? createGraph(2) : SizedBox(),
+            chartsData[country] != null ? createGraph(2) : SizedBox(),
             SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -256,9 +256,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 ),
               ],
             ),
-            countryData[country].chartsData != null ? createGraph(3) : SizedBox(),
+            chartsData[country] != null ? createGraph(3) : SizedBox(),
             SizedBox(height: 50),
-            countryData[country].chartsData == null && countryData[country].link != null
+            chartsData[country] == null && countryData[country].link != null
                 ? FlatButton(
                     child: Container(
                       padding: EdgeInsets.all(10),
@@ -277,7 +277,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     ),
                     onPressed: () {
                       setState(() {
-                        countryData[country].chartsData = Parser.getEmptyChart();
+                        chartsData[country] = Parser.getEmptyChart();
                       });
                       (_refreshIndicatorKey.currentState as dynamic)?.show();
                     },
@@ -319,10 +319,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   }
 
   Widget createGraph(int type) {
-    var daily = countryData[country].chartsData[2 + type];
+    var daily = chartsData[country][2 + type];
     var lineChartData = daily
-        ? dailyData(countryData[country].chartsData[type - 1])
-        : totalData(countryData[country].chartsData[type - 1]);
+        ? dailyData(chartsData[country][type - 1])
+        : totalData(chartsData[country][type - 1]);
     return Stack(
       children: <Widget>[
         AspectRatio(
@@ -352,15 +352,15 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 highlightColor: Colors.transparent,
                 onPressed: () {
                   setState(() {
-                    countryData[country].chartsData[2 + type] =
-                        !countryData[country].chartsData[2 + type];
+                    chartsData[country][2 + type] =
+                        !chartsData[country][2 + type];
                   });
                 },
                 child: Wrap(
                   children: <Widget>[
                     Icon(Icons.autorenew, color: Colors.white, size: 12),
                     Text(
-                      countryData[country].chartsData[2 + type] ? ' Daily' : ' Total',
+                      chartsData[country][2 + type] ? ' Daily' : ' Total',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.white,
